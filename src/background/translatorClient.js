@@ -143,7 +143,7 @@
     }
 
     return {
-      model: config.model || "gpt-4.1-mini",
+      model: config.model || "gpt-4o-mini",
       messages: [
         {
           role: "system",
