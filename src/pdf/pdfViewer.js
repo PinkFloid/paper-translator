@@ -111,6 +111,9 @@ async function translateBlock(id) {
   const block = blocks.get(id);
   block.state = "translating";
   block.el.dataset.state = "translating";
+  // If a cross-page merge rewrites block.text while this request is in flight,
+  // the stale result must be discarded (the merge re-queues a fresh request).
+  const sentText = block.text;
 
   try {
     const response = await sendMessageWithTimeout(
@@ -126,6 +129,7 @@ async function translateBlock(id) {
       60000
     );
 
+    if (block.text !== sentText) return; // superseded by a merge; ignore
     if (!response) throw new Error("后台无响应");
     if (response.error) throw new Error(response.error);
     const result = response.results && response.results[0];
@@ -232,6 +236,41 @@ function hideHighlight(pageNum) {
   state.canvasWrap.querySelector(".page-highlight").style.display = "none";
 }
 
+// A PDF paragraph that runs across a page break is extracted as two pieces
+// (one per page). If the previous page's last paragraph did not end a sentence
+// and this page's first paragraph starts mid-sentence, they are one paragraph.
+function continuesPreviousParagraph(prevText, nextText) {
+  const prev = (prevText || "").trim();
+  const next = (nextText || "").trim();
+  if (!prev || !next) return false;
+  const prevEndsSentence = /[.!?:;”’"')\]]$/.test(prev);
+  const nextStartsMidSentence = /^[a-z0-9(]/.test(next);
+  return !prevEndsSentence && nextStartsMidSentence;
+}
+
+function joinParagraphText(left, right) {
+  const a = left.trim();
+  const b = right.trim();
+  if (/[A-Za-z]-$/.test(a)) return a.slice(0, -1) + b; // undo hyphenation
+  return `${a} ${b}`;
+}
+
+// Fold the continuation text into an already-created block and re-translate it.
+function mergeContinuation(block, paragraph) {
+  block.displayText = joinParagraphText(block.displayText, paragraph.text);
+  const placeholders = [];
+  block.placeholders = placeholders;
+  block.text = maskMathRuns(maskTerms(block.displayText, userGlossaryEntries, placeholders), placeholders);
+
+  block.el.querySelector(".pt-source").textContent = block.displayText;
+  block.el.querySelector(".pt-text").textContent = block.displayText;
+  block.el.dataset.showSource = "false";
+  block.el.dataset.state = "waiting";
+  block.state = "queued";
+  queue.push(block.el.dataset.blockId);
+  pump();
+}
+
 async function ensureExtracted(pageNum) {
   const state = pageStates.get(pageNum);
   if (state.extracted) return;
@@ -241,7 +280,17 @@ async function ensureExtracted(pageNum) {
   const paragraphs = await extractParagraphs(page);
 
   let prevId = pageLastBlockId.get(pageNum - 1) || null;
-  paragraphs.forEach((paragraph, index) => {
+  let startIndex = 0;
+
+  const prevLast = prevId ? blocks.get(prevId) : null;
+  if (prevLast && paragraphs.length > 0 &&
+      continuesPreviousParagraph(prevLast.displayText, paragraphs[0].text)) {
+    mergeContinuation(prevLast, paragraphs[0]);
+    startIndex = 1;
+  }
+
+  for (let index = startIndex; index < paragraphs.length; index += 1) {
+    const paragraph = paragraphs[index];
     const id = `p${pageNum}-${index}`;
     const placeholders = [];
     const block = {
@@ -258,7 +307,7 @@ async function ensureExtracted(pageNum) {
     block.el = makeBlockElement(id, block);
     blocks.set(id, block);
     state.textPane.appendChild(block.el);
-  });
+  }
   if (prevId) pageLastBlockId.set(pageNum, prevId);
 
   if (paragraphs.length === 0) {

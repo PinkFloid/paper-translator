@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "通用翻译器",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "翻译任意网页与学术论文（arXiv、PDF），保留公式、图表、引用与排版。双语对照、滚动翻译、术语一致。Made by Liuchy.",
   "author": { "email": "liuchy2023@gmail.com" },
   "minimum_chrome_version": "105",

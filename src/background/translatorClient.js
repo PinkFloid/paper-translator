@@ -120,6 +120,8 @@
 
     lines.push(
       "Rules:",
+      "- Translate the text faithfully and in full. Never summarize, paraphrase, omit, or add content.",
+      "- The text may be an incomplete sentence or fragment (e.g. cut off at a page break). Translate it as-is; do not complete or continue it.",
       "- Keep placeholder tokens like [[PT_PH_0]] exactly as they are, in the position that fits the translated sentence.",
       "- Keep LaTeX, inline math like $x$, code, URLs, and citation markers unchanged.",
       "- Keep an academic tone. Do not add explanations, notes, or quotes around the output.",

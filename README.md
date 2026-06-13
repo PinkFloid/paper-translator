@@ -121,6 +121,7 @@ system prompt follows the configured `targetLanguage`. The response is read from
 - 段落重建：`src/pdf/pdfTranslator.js` 把 `getTextContent()` 的定位碎片按基线合并成行，再按"垂直间距 / 字号突变（比较相邻行）/ 跨栏跳变 / 句末缩进 / 编号标题前后强制分段"聚合成段；连字符断词自动拼回；旋转文本（arXiv 水印）、页眉页脚、页码被过滤。
 - 公式行、表格单元格、坐标轴标签等提取出来是符号乱码，按字母占比过滤后不送翻译（左侧原版页面本来就可读）。
 - 段落内的行内公式（Unicode 数学区段字符：𝑨𝑥、希腊字母、←∈ℝ 等，含 `= ( )` 等胶水符号）以占位符送翻译、译文中原样还原（`maskMathRuns`）——API 不接触公式本体，不会乱改符号，也不浪费 token；单元测试 `node test/pdfText.test.js`。
+- 跨页段落合并：PDF 逐页提取，一个段落跨页时会被拆成两半。`continuesPreviousParagraph`（上页末未结句 + 本页首小写起始）检测续接，把下一页开头合并回上一页那个块并重新翻译（`mergeContinuation`，带 in-flight 竞态保护）。否则半句话的片段会触发模型脑补/概括。翻译提示词也加了"忠实完整翻译、不要概括或补全片段"。
 - canvas 按需渲染并设上限（12 页），远处页面降级为占位符防止内存膨胀。
 - 阅读器页面通过 `web_accessible_resources` 暴露，论文页中的"翻译 PDF"链接才能直接打开。
 
