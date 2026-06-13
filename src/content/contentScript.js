@@ -290,7 +290,7 @@
   function scanAndObserve(root, onComplete) {
     const candidates = collectCandidates(root);
     if (candidates.length === 0) {
-      if (onComplete) onComplete();
+      if (typeof onComplete === "function") onComplete();
       return;
     }
 
@@ -312,7 +312,7 @@
 
       if (index < candidates.length) {
         scheduleIdle(step);
-      } else if (onComplete) {
+      } else if (typeof onComplete === "function") {
         onComplete();
       }
     };
@@ -348,7 +348,9 @@
           .filter((element) => element.isConnected)
           .filter((element) => !element.closest("[data-paper-translator-ignore='true']"))
           .filter((element) => !element.closest("[data-paper-translator-block]"))
-          .forEach(scanAndObserve);
+          // Wrap so Array.forEach's (element, index) doesn't pass the index as
+          // scanAndObserve's onComplete argument.
+          .forEach((element) => scanAndObserve(element));
       }
       addPdfEntry();
     };
