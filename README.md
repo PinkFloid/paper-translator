@@ -15,6 +15,8 @@ Chrome MV3 extension for translating academic paper pages (arXiv HTML, OpenRevie
 - **公式/图片/代码/表格保护**：以 `[[PT_PH_n]]` 占位符送翻译，译文中原样还原；MathJax/KaTeX/LaTeXML 元素、链接、章节编号（`.ltx_tag`）整体保留。
 - **标题白名单**：只翻译结构性标题（章节/小节/摘要）；定理、证明、`\paragraph` 这类行内/微型标签（`ltx_runin`、`ltx_title_theorem`、`ltx_title_paragraph`）跳过，避免正文中出现多余的小标题行。标题译文自动去掉结尾句号（"Abstract." → "摘要" 而非 "摘要。"）。
 - **叶子 div 检测**：没有块级子元素但含足量英文的裸 `div`/`dd`（OpenReview/acmart 的关键词列表等）也会被识别为可翻译块（`div:not(:has(...))`）；作者/日期行（`.ltx_authors` 等，人名不该音译）和 LaTeXML 算法清单（`.ltx_listing*`，符号汤）明确排除。
+- **链接型标题**：整条标题本身是 `<a href>` 的新闻站很常见。`a[href]` 仅在文本较短（≤16 字符，引用/交叉引用如 `[1]`、`Figure 3`）时作占位符保留；更长的链接被视为正文，descend 进去翻译其文字（`shouldPreserveElement`）。学术论文的短引用仍保留可点。
+- **通用网页覆盖**：候选选择器除 `article`/`main` 下的标题外，还包含裸 `h1`–`h4`、`p`、`li`、`dd`，覆盖新闻站等非论文结构；导航/页眉/页脚/侧栏（`nav`/`header`/`footer`/`aside`）仍由 skip 祖先过滤。
 - **术语一致性**（`src/shared/glossary.js`）：三层机制保证 "Arctic" 这类名字不会一会保留一会变成"北极"——
   1. 每个请求携带论文标题作为上下文；
   2. 自动识别专有名词（缩写词、混合大小写、带数字的名字，以及"句中大写且全文从不以小写出现"的词，如模型名、作者名），写入提示词要求保留英文；HTML 页在初扫完成后计算一次并冻结，PDF 取元数据标题+前 3 页；

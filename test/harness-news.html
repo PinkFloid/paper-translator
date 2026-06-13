@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>News-structure harness</title>
+    <style> body { max-width: 900px; margin: 0 auto; font: 16px/1.6 Georgia, serif; } nav a { margin-right: 12px; } </style>
+  </head>
+  <body>
+    <script>
+      // Stub: translate everything, record what text each block sent.
+      globalThis.__sent = [];
+      globalThis.chrome = {
+        runtime: {
+          getURL: (p) => p,
+          sendMessage: async (m) => {
+            const b = m.payload.blocks[0];
+            globalThis.__sent.push(b.text);
+            return { results: [{ id: b.id, translatedText: "【译】" + b.text }] };
+          },
+          onMessage: { addListener: () => {} }
+        },
+        storage: { local: { get: async () => ({ "paperTranslator.config": {
+          enabled: true, autoTranslate: true, displayMode: "bilingual",
+          apiEndpoint: "http://fake", urlRules: ["*"], maxConcurrentRequests: 4,
+          glossary: "", contextEnhanced: false
+        } }), set: async () => {} } }
+      };
+    </script>
+
+    <nav id="nav"><a href="#a">World in brief navigation link that is long</a><a href="#b">Business</a></nav>
+
+    <!-- 1. headline where the <a> is a CHILD of the heading (previously masked away) -->
+    <h3 id="case1"><a href="#1">Forget the World Cup, culture is becoming more fragmented</a></h3>
+
+    <!-- 2. leaf div wrapping a long link entirely -->
+    <div id="case2"><a href="#2">SpaceX repeatedly does things that others think are impossible</a></div>
+
+    <!-- 3. bare heading outside article/main -->
+    <h2 id="case3">Treating pancreatic tumours may have revealed a master switch</h2>
+
+    <!-- 4. body with a short inline citation link that must stay preserved -->
+    <p id="case4">The Swiss would be foolish to cap their population at ten million, see <a href="#ref" id="cite">[1]</a> for the detailed argument and figures.</p>
+
+    <!-- 5. headline as <a> child plus a separate summary paragraph -->
+    <div id="case5">
+      <h4><a href="#5">David Hockney believed in working from the heart and soul</a></h4>
+      <p>Follow in-depth, personalized coverage of the late artist and his world.</p>
+    </div>
+
+    <script src="../src/shared/constants.js"></script>
+    <script src="../src/shared/config.js"></script>
+    <script src="../src/shared/glossary.js"></script>
+    <script src="../src/content/domScanner.js"></script>
+    <script src="../src/content/blockManager.js"></script>
+    <script src="../src/content/renderer.js"></script>
+    <script src="../src/content/readingObserver.js"></script>
+    <script src="../src/content/contentScript.js"></script>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Paper Translator",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Translate paper pages while preserving formulas, images, and layout. Made by Liuchy.",
   "author": { "email": "liuchy2023@gmail.com" },
   "minimum_chrome_version": "105",

@@ -24,7 +24,12 @@
     ".abstract p",
     "blockquote.abstract",
     "h1.title",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
     "p",
+    "li",
     "dd",
     LEAF_BLOCK_SELECTOR
   ].join(",");
@@ -82,6 +87,23 @@
   ].join(",");
 
   const SKIP_SERIALIZE_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"]);
+
+  // Inline links up to this length are treated as citations / cross-references
+  // ("[1]", "Figure 3") and preserved verbatim. Longer link text is real
+  // content — typically a headline that is itself a link — and is descended
+  // into so it gets translated instead of masked away to nothing.
+  const LINK_PRESERVE_MAX_CHARS = 16;
+
+  function shouldPreserveElement(element) {
+    if (!element.matches(PRESERVE_SELECTOR)) return false;
+    if (
+      element.tagName === "A" &&
+      (element.textContent || "").trim().length > LINK_PRESERVE_MAX_CHARS
+    ) {
+      return false;
+    }
+    return true;
+  }
 
   let nextBlockNumber = 1;
 
@@ -170,7 +192,7 @@
       return;
     }
 
-    if (element.matches(PRESERVE_SELECTOR)) {
+    if (shouldPreserveElement(element)) {
       const token = `[[PT_PH_${placeholders.length}]]`;
       placeholders.push({
         token,
