@@ -73,23 +73,6 @@ curl -L https://arxiv.org/html/2312.00752v2 -o test/real-paper.html # Mamba HTML
 3. Click "Load unpacked".
 4. Select this folder: `D:\translator`.
 
-## 分发与上架
-
-运行 `powershell -ExecutionPolicy Bypass -File pack.ps1` 生成 `dist\paper-translator-<版本>.zip`
-（自动排除 `test\` 测试论文——那些 PDF 不可再分发；zip 条目使用正斜杠，符合商店要求）。
-
-**发给同学（免上架）**：把 zip 发过去，对方解压后在 `chrome://extensions` 开启"开发者模式"→"加载已解压的扩展程序"选中解压目录即可。
-注意：① 每人需在设置页配置自己的 API Endpoint/Key；② 直接发 `.crx` 在普通 Windows Chrome 上会被拦截，不要走那条路；③ 更新靠重新发 zip。
-
-**上架 Chrome Web Store**：
-1. 注册开发者账号（一次性 $5）：https://chrome.google.com/webstore/devconsole
-2. 上传 zip，填写商店信息：名称/描述、至少 1 张 1280×800 截图、128px 图标（`assets/icons/icon128.png`）。
-3. 隐私声明：必须提供隐私政策链接（可用 GitHub README），如实说明"页面文本会发送到**用户自行配置**的翻译 API，插件本身不收集任何数据，API Key 仅存于本地 storage"。
-4. 权限说明：`host_permissions: <all_urls>` 会触发更严的人工审核，需在"权限理由"栏解释（用户可自定义任意论文站点的网址规则 + API 端点域名不可预知）。审核通常几个工作日。
-5. 上架后用户自动更新，发新版只需改 `manifest.json` 的 `version` 再传新 zip。
-
-也可以同时上架 Microsoft Edge 加载项商店（注册免费，同一个 zip 直接传）。
-
 ## Configure The API
 
 Open the extension options page and fill:
