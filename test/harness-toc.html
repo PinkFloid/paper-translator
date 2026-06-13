@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>TOC harness</title>
+    <style> body { max-width: 820px; margin: 0 auto; font: 16px/1.6 Georgia, serif; } </style>
+  </head>
+  <body>
+    <script>
+      globalThis.chrome = {
+        runtime: { getURL: p => p, sendMessage: async (m) => { const b = m.payload.blocks[0]; return { results: [{ id: b.id, translatedText: "【译】" + b.text }] }; }, onMessage: { addListener: () => {} } },
+        storage: { local: { get: async () => ({ "paperTranslator.config": { enabled: true, autoTranslate: true, displayMode: "bilingual", apiEndpoint: "http://fake", urlRules: ["*"], maxConcurrentRequests: 4, glossary: "", contextEnhanced: false } }), set: async () => {} } }
+      };
+    </script>
+
+    <!-- 1. real site navigation menu — must STAY skipped -->
+    <nav id="mainnav" aria-label="Main navigation">
+      <a href="#">World in brief section navigation link here</a>
+      <a href="#">Business section navigation link here</a>
+    </nav>
+
+    <!-- 2. TOC as nav[aria-label*=contents] with li>a -->
+    <nav id="toc1" aria-label="Table of contents">
+      <ol>
+        <li><a href="#s1">1. Regulation and public safety</a></li>
+        <li><a href="#s2">2. Macroeconomics and tax policy</a></li>
+      </ol>
+    </nav>
+
+    <!-- 3. TOC as aside.toc with direct <a> children -->
+    <aside id="toc2" class="toc">
+      <a href="#s3">3. Accelerating AI's positive impact</a>
+      <a href="#s4">4. The state and civil liberties</a>
+    </aside>
+
+    <!-- 4. TOC as [role=doc-toc] with direct <a> -->
+    <div id="toc3" role="doc-toc">
+      <a href="#s5">5. Securing leadership by democracies</a>
+      <a href="#s6">A window of opportunity</a>
+    </div>
+
+    <script src="../src/shared/constants.js"></script>
+    <script src="../src/shared/config.js"></script>
+    <script src="../src/shared/glossary.js"></script>
+    <script src="../src/content/domScanner.js"></script>
+    <script src="../src/content/blockManager.js"></script>
+    <script src="../src/content/renderer.js"></script>
+    <script src="../src/content/readingObserver.js"></script>
+    <script src="../src/content/contentScript.js"></script>
+  </body>
+</html>

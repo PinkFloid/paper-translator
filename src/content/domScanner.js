@@ -36,6 +36,12 @@
     // length threshold in makeBlock.
     "button",
     "summary",
+    // Table-of-contents entries that are direct links (list/button TOCs are
+    // already covered by bare li/button above).
+    "[role='doc-toc'] a",
+    "nav[aria-label*='content' i] a",
+    ".toc a",
+    ".table-of-contents a",
     LEAF_BLOCK_SELECTOR
   ].join(",");
 
@@ -137,9 +143,24 @@
     ".ltx_title_bibliography"
   ].join(",");
 
+  // Tables of contents usually live inside nav/aside (normally skipped), and
+  // their entries are short titles. Recognize them so the entries translate
+  // with a heading-like length threshold.
+  const TOC_SELECTOR = [
+    "[role='doc-toc']",
+    "nav[aria-label*='content' i]",
+    ".toc",
+    ".table-of-contents",
+    "[class*='table-of-contents' i]",
+    "#toc",
+    "#table-of-contents"
+  ].join(",");
+
   function headingKind(element) {
     if (element.matches(LABEL_TITLE_SELECTOR)) return "label";
-    if (element.matches(STRUCTURAL_TITLE_SELECTOR)) return "structural";
+    if (element.matches(STRUCTURAL_TITLE_SELECTOR) || element.closest(TOC_SELECTOR)) {
+      return "structural";
+    }
     if (/^h[1-6]$/i.test(element.tagName) || element.classList.contains("ltx_title")) {
       return "heading";
     }
@@ -166,12 +187,21 @@
     return Boolean(ancestor && ancestor !== document.body);
   }
 
-  function isSkippable(element) {
+  function isLongLink(element) {
     return (
-      element.closest(SKIP_ANCESTOR_SELECTOR) ||
-      element.matches(PRESERVE_SELECTOR) ||
-      element.dataset.paperTranslatorBlock
+      element.tagName === "A" &&
+      (element.textContent || "").trim().length > LINK_PRESERVE_MAX_CHARS
     );
+  }
+
+  function isSkippable(element) {
+    if (element.dataset.paperTranslatorBlock) return true;
+    // Preserve elements aren't blocks — except a long link, which is real
+    // content (a TOC entry or a headline that is itself a link).
+    if (element.matches(PRESERVE_SELECTOR) && !isLongLink(element)) return true;
+    // Table-of-contents content is translated even though it lives in nav/aside.
+    if (element.closest(TOC_SELECTOR)) return false;
+    return Boolean(element.closest(SKIP_ANCESTOR_SELECTOR));
   }
 
   // Serialization must stay style-free: getComputedStyle here forces reflow per
