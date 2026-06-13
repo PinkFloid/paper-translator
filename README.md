@@ -1,6 +1,8 @@
-# Paper Translator
+# 通用翻译器 (General Web Translator)
 
-Chrome MV3 extension for translating academic paper pages (arXiv HTML, OpenReview, ACL Anthology, ...) while preserving formulas, images, code blocks, tables, and citation links.
+Chrome MV3 浏览器扩展：把**任意网页**和**学术论文**（arXiv HTML、PDF、OpenReview、ACL Anthology 等）翻译成中文，同时保留公式、图表、代码、表格和引用链接。
+
+> 项目最初是 arXiv 论文翻译器（仓库名仍为 `paper-translator`），后扩展为通用网页翻译器：支持新闻站、FAQ 折叠、目录、iframe 内嵌模块，以及在任意站点按需翻译。代码内部仍沿用 `PaperTranslator*` 命名空间与 `paperTranslator.*` 存储键以保持向后兼容。
 
 ## Features
 
