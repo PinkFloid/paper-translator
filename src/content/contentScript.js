@@ -10,6 +10,11 @@
   const manager = createBlockManager();
   const queue = [];
 
+  // With all_frames the script runs inside every iframe too (NYTimes-style
+  // embedded subscription/checkout modules etc.). Frame-level chrome like the
+  // status pill and the PDF entry only belong in the top document.
+  const inTopFrame = window.top === window.self;
+
   let config = null;
   let active = false;
   let readingObserver = null;
@@ -403,7 +408,7 @@
   }
 
   function addPdfEntry() {
-    if (!config.translatePdfLinks || pdfEntryAdded) return;
+    if (!inTopFrame || !config.translatePdfLinks || pdfEntryAdded) return;
 
     const links = Array.from(document.querySelectorAll("a[href]"));
     const pdfLink = links.find((link) => {
@@ -440,11 +445,15 @@
     // Force the page on even when its URL is not in the rules ("translate
     // this page" / "always translate this site" from the popup).
     if (message.type === MESSAGE_TYPES.ACTIVATE_PAGE) {
+      // The popup broadcasts to every frame; each iframe activates and
+      // translates its own content, but only the top frame replies (otherwise
+      // multiple responders trigger a message-channel warning).
       activate().then(() => {
+        if (!inTopFrame) return;
         const queued = enqueue(manager.idsWithStatus("pending"));
         sendResponse({ activated: true, queued, total: manager.counts().total });
       });
-      return true; // sendResponse is called asynchronously
+      return inTopFrame; // only the top frame keeps the channel open to respond
     }
 
     if (message.type === MESSAGE_TYPES.TRANSLATE_PAGE) {
@@ -471,7 +480,7 @@
     maxInFlight = Math.min(Math.max(Number(config.maxConcurrentRequests) || 4, 1), 8);
 
     ensureStyle(config.displayMode);
-    initStatus(onStatusClick);
+    if (inTopFrame) initStatus(onStatusClick);
     readingObserver = createReadingObserver(onBlocksVisible);
     listenForClicks();
     scanAndObserve(document, computeDocumentContext);
