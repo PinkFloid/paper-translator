@@ -65,6 +65,11 @@ h1 {
   cursor: pointer;
 }
 
+/* The explicit display above otherwise overrides the hidden attribute. */
+.add-site[hidden] {
+  display: none;
+}
+
 button {
   padding: 7px 10px;
   border: 1px solid #c8d0d8;
