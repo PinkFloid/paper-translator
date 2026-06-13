@@ -17,6 +17,7 @@ Chrome MV3 extension for translating academic paper pages (arXiv HTML, OpenRevie
 - **叶子 div 检测**：没有块级子元素但含足量英文的裸 `div`/`dd`（OpenReview/acmart 的关键词列表等）也会被识别为可翻译块（`div:not(:has(...))`）；作者/日期行（`.ltx_authors` 等，人名不该音译）和 LaTeXML 算法清单（`.ltx_listing*`，符号汤）明确排除。
 - **链接型标题**：整条标题本身是 `<a href>` 的新闻站很常见。`a[href]` 仅在文本较短（≤16 字符，引用/交叉引用如 `[1]`、`Figure 3`）时作占位符保留；更长的链接被视为正文，descend 进去翻译其文字（`shouldPreserveElement`）。学术论文的短引用仍保留可点。
 - **通用网页覆盖**：候选选择器除 `article`/`main` 下的标题外，还包含裸 `h1`–`h4`、`p`、`li`、`dd`，覆盖新闻站等非论文结构；导航/页眉/页脚/侧栏（`nav`/`header`/`footer`/`aside`）仍由 skip 祖先过滤。
+- **FAQ / 折叠按钮**：`<button>`/`<summary>` 不再无脑跳过——只翻译"内容型"触发器（文本 ≥35 字符，或以 `?` 结尾的问句），短 UI 按钮（"Save"、"Continue to checkout"）仍跳过。折叠面板里的答案在展开（display 由 none→block）进入视口时由 IntersectionObserver 自动翻译。
 - **术语一致性**（`src/shared/glossary.js`）：三层机制保证 "Arctic" 这类名字不会一会保留一会变成"北极"——
   1. 每个请求携带论文标题作为上下文；
   2. 自动识别专有名词（缩写词、混合大小写、带数字的名字，以及"句中大写且全文从不以小写出现"的词，如模型名、作者名），写入提示词要求保留英文；HTML 页在初扫完成后计算一次并冻结，PDF 取元数据标题+前 3 页；

@@ -31,6 +31,11 @@
     "p",
     "li",
     "dd",
+    // Accordion/FAQ triggers: content-like (long) button/summary text is real
+    // copy. Short UI buttons ("Save", "Continue") are filtered by the body
+    // length threshold in makeBlock.
+    "button",
+    "summary",
     LEAF_BLOCK_SELECTOR
   ].join(",");
 
@@ -72,7 +77,6 @@
     "textarea",
     "input",
     "select",
-    "button",
     "nav",
     "header",
     "footer",
@@ -233,7 +237,10 @@
     if (kind === "label") return null;
 
     const text = (element.textContent || "").trim();
-    if (text.length < MIN_TEXT_LENGTH[kind] || !hasEnglishText(text, kind === "structural")) {
+    // A question ("How does the bill work?") is translatable content even when
+    // shorter than the body threshold — common for FAQ accordion triggers.
+    const isQuestion = /[?？]\s*$/.test(text) && (text.match(/[A-Za-z][A-Za-z-]{1,}/g) || []).length >= 3;
+    if ((text.length < MIN_TEXT_LENGTH[kind] && !isQuestion) || !hasEnglishText(text, kind === "structural")) {
       return null;
     }
 

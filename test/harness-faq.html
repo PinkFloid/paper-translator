@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>FAQ / accordion harness</title>
+    <style> body { max-width: 820px; margin: 0 auto; font: 16px/1.6 Georgia, serif; } button { display:block; width:100%; text-align:left; font:inherit; padding:10px; } </style>
+  </head>
+  <body>
+    <script>
+      globalThis.chrome = {
+        runtime: { getURL: p => p, sendMessage: async (m) => { const b = m.payload.blocks[0]; return { results: [{ id: b.id, translatedText: "【译】" + b.text }] }; }, onMessage: { addListener: () => {} } },
+        storage: { local: { get: async () => ({ "paperTranslator.config": { enabled: true, autoTranslate: true, displayMode: "bilingual", apiEndpoint: "http://fake", urlRules: ["*"], maxConcurrentRequests: 4, glossary: "", contextEnhanced: false } }), set: async () => {} } }
+      };
+    </script>
+
+    <h2>Questions?</h2>
+
+    <!-- 1. long FAQ question button (passes 35-char threshold) -->
+    <button id="q1" aria-expanded="true">Who is eligible to join my family subscription?</button>
+    <!-- expanded answer (a normal visible paragraph) -->
+    <p id="a1">You can invite your family, friends, or anyone else that might enjoy a subscription to the New York Times, no matter where they live.</p>
+
+    <!-- 2. shorter question button (under 35 chars, but ends with ? -> should translate) -->
+    <button id="q2" aria-expanded="false">How does the bill work?</button>
+
+    <!-- 3. short UI button: must NOT translate -->
+    <button id="ui1">Continue to checkout</button>
+    <!-- 4. very short UI button -->
+    <button id="ui2">Save</button>
+
+    <!-- 5. details/summary accordion -->
+    <details>
+      <summary id="q3">What happens to my saved content if I switch to a family subscription plan?</summary>
+      <p id="a3">Your saved content, stats and streaks all carry over to the new family subscription automatically.</p>
+    </details>
+
+    <script src="../src/shared/constants.js"></script>
+    <script src="../src/shared/config.js"></script>
+    <script src="../src/shared/glossary.js"></script>
+    <script src="../src/content/domScanner.js"></script>
+    <script src="../src/content/blockManager.js"></script>
+    <script src="../src/content/renderer.js"></script>
+    <script src="../src/content/readingObserver.js"></script>
+    <script src="../src/content/contentScript.js"></script>
+  </body>
+</html>
