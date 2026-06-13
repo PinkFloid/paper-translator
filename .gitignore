@@ -1,0 +1,16 @@
+# Build artifacts (regenerate with pack.ps1)
+dist/
+
+# Downloaded test fixtures — third-party copyrighted papers, do NOT redistribute.
+# Re-fetch them with the curl commands in README's testing section.
+test/*.pdf
+test/real-paper.html
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+.vscode/
+.idea/

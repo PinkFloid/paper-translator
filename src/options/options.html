@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Paper Translator Options</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main class="container">
+      <h1>Paper Translator</h1>
+
+      <section>
+        <label class="checkbox">
+          <input id="enabled" type="checkbox">
+          启用自动翻译
+        </label>
+        <label class="checkbox">
+          <input id="autoTranslate" type="checkbox">
+          页面打开后自动翻译当前阅读区域
+        </label>
+        <label class="checkbox">
+          <input id="cacheEnabled" type="checkbox">
+          启用本地缓存
+        </label>
+        <label class="checkbox">
+          <input id="contextEnhanced" type="checkbox">
+          上下文增强翻译（每段携带上一段原文作参考，指代翻译更准；token 消耗约翻倍，仅 openai-compatible 模式生效）
+        </label>
+        <label>
+          译文显示方式
+          <select id="displayMode">
+            <option value="bilingual">双语对照（译文显示在原文下方）</option>
+            <option value="replace">仅译文（点击段落切换原文）</option>
+          </select>
+        </label>
+      </section>
+
+      <section>
+        <h2>翻译 API</h2>
+        <label>
+          API 模式
+          <select id="apiMode">
+            <option value="simple">simple</option>
+            <option value="openai-compatible">openai-compatible</option>
+          </select>
+        </label>
+        <label>
+          API Endpoint
+          <input id="apiEndpoint" type="url" placeholder="https://example.com/translate">
+        </label>
+        <label>
+          API Key
+          <input id="apiKey" type="password" placeholder="可选">
+        </label>
+        <label>
+          Model
+          <input id="model" type="text" placeholder="openai-compatible 模式可用">
+        </label>
+        <label>
+          目标语言
+          <input id="targetLanguage" type="text" value="zh-CN">
+        </label>
+        <label>
+          最大并发请求数
+          <input id="maxConcurrentRequests" type="number" min="1" max="8">
+        </label>
+      </section>
+
+      <section>
+        <h2>术语表</h2>
+        <p class="hint">
+          每行一条，保证术语在所有段落中翻译一致。<code>Arctic</code> 表示保留原文不翻译；
+          <code>attention=注意力</code> 表示固定译法；<code>#</code> 开头为注释。
+          匹配区分大小写：<code>Attention</code> 只锁定大写形式，小写的普通 attention 不受影响；
+          若文中同时存在小写形式，句首的大写词会交给模型按语境判断。
+          插件还会自动识别论文中的专有名词（模型名、数据集名等）并保持原文。
+        </p>
+        <textarea id="glossary" rows="6" spellcheck="false" placeholder="Arctic&#10;attention=注意力"></textarea>
+      </section>
+
+      <section>
+        <h2>网址规则</h2>
+        <textarea id="urlRules" rows="8" spellcheck="false"></textarea>
+      </section>
+
+      <section>
+        <h2>PDF</h2>
+        <label class="checkbox">
+          <input id="translatePdfLinks" type="checkbox">
+          在论文页标记 PDF 翻译入口
+        </label>
+      </section>
+
+      <div class="actions">
+        <button id="save" type="button">保存</button>
+        <button id="reset" type="button">恢复默认</button>
+        <span id="status" role="status"></span>
+      </div>
+      <p id="credit" class="credit"></p>
+    </main>
+
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/config.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

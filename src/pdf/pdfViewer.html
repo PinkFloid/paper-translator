@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PDF 翻译阅读器</title>
+    <link rel="stylesheet" href="pdfViewer.css">
+  </head>
+  <body>
+    <header id="toolbar">
+      <div id="docTitle">PDF 翻译阅读器</div>
+      <div id="progress" data-state="idle"></div>
+      <div class="toolbar-actions">
+        <button id="translateAll" type="button">翻译整篇</button>
+        <a id="sourceLink" target="_blank" rel="noopener noreferrer">打开原始 PDF</a>
+      </div>
+    </header>
+
+    <div id="banner" hidden></div>
+
+    <main id="pages"></main>
+
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/config.js"></script>
+    <script src="../shared/glossary.js"></script>
+    <script src="pdfTranslator.js"></script>
+    <script type="module" src="pdfViewer.js"></script>
+  </body>
+</html>

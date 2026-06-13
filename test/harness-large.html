@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Paper Translator Large Page Harness</title>
+    <style>
+      body { max-width: 760px; margin: 0 auto; padding: 24px; font: 16px/1.6 Georgia, serif; }
+    </style>
+  </head>
+  <body>
+    <script>
+      globalThis.chrome = {
+        runtime: {
+          getURL: (path) => path,
+          sendMessage: async (message) => {
+            await new Promise((resolve) => setTimeout(resolve, 150));
+            const block = message.payload.blocks[0];
+            return { results: [{ id: block.id, translatedText: "【译文】" + block.text.slice(0, 80) }] };
+          },
+          onMessage: { addListener: () => {} }
+        },
+        storage: {
+          local: {
+            get: async () => ({
+              "paperTranslator.config": {
+                enabled: true,
+                autoTranslate: true,
+                displayMode: "bilingual",
+                apiEndpoint: "http://fake.example/translate",
+                urlRules: ["*"],
+                maxConcurrentRequests: 4
+              }
+            }),
+            set: async () => {}
+          }
+        }
+      };
+
+      // Track main-thread stalls caused by the content script.
+      globalThis.__longTasks = [];
+      new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => __longTasks.push(Math.round(entry.duration)));
+      }).observe({ entryTypes: ["longtask"] });
+    </script>
+
+    <article id="paper"></article>
+    <script>
+      const article = document.getElementById("paper");
+      const parts = [];
+      for (let i = 0; i < 3000; i++) {
+        parts.push(
+          `<p>Paragraph ${i}: the dominant sequence transduction models are based on complex ` +
+          `recurrent or convolutional neural networks that include an encoder and a decoder, ` +
+          `as shown in <a href="#r${i}">[${i % 90}]</a> with inline math <span class="MathJax">x_${i}</span>.</p>`
+        );
+      }
+      article.innerHTML = parts.join("");
+      globalThis.__scriptsStart = performance.now();
+    </script>
+
+    <script src="../src/shared/constants.js"></script>
+    <script src="../src/shared/config.js"></script>
+    <script src="../src/content/domScanner.js"></script>
+    <script src="../src/content/blockManager.js"></script>
+    <script src="../src/content/renderer.js"></script>
+    <script src="../src/content/readingObserver.js"></script>
+    <script src="../src/content/contentScript.js"></script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Paper Translator</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <h1>Paper Translator</h1>
+      <label class="checkbox">
+        <input id="enabled" type="checkbox">
+        启用插件
+      </label>
+      <label class="checkbox">
+        <input id="autoTranslate" type="checkbox">
+        滚动到哪里翻译到哪里
+      </label>
+      <p id="currentStatus">正在读取配置…</p>
+      <div class="actions primary-actions">
+        <button id="translatePage" type="button">翻译此网页</button>
+        <button id="translatePdf" type="button" hidden>翻译当前 PDF</button>
+      </div>
+      <button id="addSite" type="button" class="add-site" hidden></button>
+      <div class="actions">
+        <button id="save" type="button">保存</button>
+        <button id="options" type="button">设置</button>
+        <button id="clearCache" type="button">清空缓存</button>
+      </div>
+      <p id="credit" class="credit"></p>
+    </main>
+
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/config.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

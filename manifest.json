@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Paper Translator",
+  "version": "0.6.1",
+  "description": "Translate paper pages while preserving formulas, images, and layout. Made by Liuchy.",
+  "author": { "email": "liuchy2023@gmail.com" },
+  "minimum_chrome_version": "105",
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "src/background/serviceWorker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/config.js",
+        "src/shared/glossary.js",
+        "src/content/domScanner.js",
+        "src/content/blockManager.js",
+        "src/content/renderer.js",
+        "src/content/readingObserver.js",
+        "src/content/contentScript.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Paper Translator",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/pdf/pdfViewer.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "options_page": "src/options/options.html"
+}

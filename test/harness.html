@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Paper Translator Harness</title>
+    <style>
+      body { max-width: 760px; margin: 0 auto; padding: 24px; font: 16px/1.6 Georgia, serif; }
+      .MathJax { color: #7048b5; font-family: monospace; }
+    </style>
+  </head>
+  <body>
+    <script>
+      // Stub the chrome extension APIs so the content scripts run on a plain
+      // page. ?mode=replace switches the display mode; paragraphs containing
+      // FAILME simulate API errors. ?match=0 makes the URL rules NOT match, so
+      // the content script stays inactive until __dispatch(ACTIVATE_PAGE).
+      const params = new URLSearchParams(location.search);
+      const mode = params.get("mode") === "replace" ? "replace" : "bilingual";
+      const urlRules = params.get("match") === "0" ? ["https://never.example/*"] : ["*"];
+      globalThis.__sentPayloads = [];
+      const messageListeners = [];
+      // Route a popup-style message to the content script's onMessage listeners
+      // and resolve with whatever it passes to sendResponse.
+      globalThis.__dispatch = (message) =>
+        new Promise((resolve) => {
+          let answered = false;
+          const respond = (value) => {
+            answered = true;
+            resolve(value);
+          };
+          for (const listener of messageListeners) {
+            if (listener(message, {}, respond) === true) return; // async response
+          }
+          if (!answered) resolve(undefined);
+        });
+      globalThis.chrome = {
+        runtime: {
+          getURL: (path) => path,
+          sendMessage: async (message) => {
+            globalThis.__sentPayloads.push(message.payload);
+            await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 400));
+            const block = message.payload.blocks[0];
+            if (/FAILME/.test(block.text)) {
+              return { results: [{ id: block.id, translatedText: "", error: "模拟 API 失败" }] };
+            }
+            return { results: [{ id: block.id, translatedText: "【译文】" + block.text }] };
+          },
+          onMessage: { addListener: (fn) => messageListeners.push(fn) }
+        },
+        storage: {
+          local: {
+            get: async () => ({
+              "paperTranslator.config": {
+                enabled: true,
+                autoTranslate: true,
+                displayMode: mode,
+                apiEndpoint: "http://fake.example/translate",
+                urlRules,
+                maxConcurrentRequests: 4,
+                glossary: "Arctic\nattention=注意力\nAttention"
+              }
+            }),
+            set: async () => {}
+          }
+        }
+      };
+    </script>
+
+    <article>
+      <h1>Attention Is All You Need</h1>
+      <p id="p1">
+        The dominant sequence transduction models are based on complex recurrent or
+        convolutional neural networks that include an encoder and a decoder, as shown
+        in <a href="#ref1" id="cite-link">[1]</a> and the inline formula
+        <span class="MathJax">E = mc^2</span> which must survive translation.
+      </p>
+      <p id="p2">
+        FAILME This paragraph simulates an API failure so that the retry path and the
+        error styling can be exercised without a real backend service available.
+      </p>
+      <p id="p3">
+        We propose a new simple network architecture, the Transformer, based solely on
+        attention mechanisms, dispensing with recurrence and convolutions entirely.
+        Experiments on two machine translation tasks show these models to be superior
+        in quality while being more parallelizable, requiring significantly less time
+        to train, with code like <code>softmax(QK^T)</code> kept verbatim.
+      </p>
+      <p id="p-glossary">
+        We evaluate Arctic on retrieval benchmarks and find that Arctic performs strongly.
+        The attention mechanism inside Arctic follows standard practice. Separately, the
+        Borealis system uses aggressive caching, and Borealis remains our main baseline
+        even though running Borealis end to end is costly.
+      </p>
+      <p id="p-collision">
+        Our model named Attention beats every baseline, and Attention is the headline
+        contribution of this work. Attention weights themselves are computed with a
+        plain softmax over the usual attention scores.
+      </p>
+      <h6 id="h-abstract" class="ltx_title ltx_title_abstract">Abstract.</h6>
+      <div id="keywords-block" class="ltx_keywords">
+        expert-novice skill differences, expert-amateur performance differences, motor
+        skill visualization, skill assessment, localized practice feedback, piano practice,
+        music performance feedback, weakly supervised localization
+      </div>
+      <h2>Introduction</h2>
+      <p id="p4">
+        Recurrent neural networks, long short-term memory and gated recurrent neural
+        networks in particular, have been firmly established as state of the art
+        approaches in sequence modeling and transduction problems such as language
+        modeling and machine translation, with a footnote marker<sup>1</sup> preserved.
+      </p>
+      <pre><code>def attention(q, k, v):
+    return softmax(q @ k.T) @ v</code></pre>
+      <div style="height: 2400px"></div>
+      <p id="p-below-fold">
+        This paragraph sits far below the fold and should only be translated after the
+        reader scrolls close to it, demonstrating that the reading observer requests
+        translations lazily instead of translating the entire document at once.
+      </p>
+    </article>
+
+    <script src="../src/shared/constants.js"></script>
+    <script src="../src/shared/config.js"></script>
+    <script src="../src/shared/glossary.js"></script>
+    <script src="../src/content/domScanner.js"></script>
+    <script src="../src/content/blockManager.js"></script>
+    <script src="../src/content/renderer.js"></script>
+    <script src="../src/content/readingObserver.js"></script>
+    <script src="../src/content/contentScript.js"></script>
+  </body>
+</html>

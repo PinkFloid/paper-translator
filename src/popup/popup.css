@@ -1,0 +1,89 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  width: 300px;
+  margin: 0;
+  color: #1f2933;
+}
+
+main {
+  padding: 16px;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#currentStatus {
+  min-height: 36px;
+  margin: 8px 0 14px;
+  color: #52616f;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.primary-actions {
+  margin-bottom: 10px;
+}
+
+.primary-actions button {
+  flex: 1;
+  border-color: #1f5eff;
+  background: #1f5eff;
+  color: #fff;
+  font-weight: 600;
+}
+
+.add-site {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px dashed #1f5eff;
+  border-radius: 6px;
+  background: #f4f7ff;
+  color: #1f5eff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button {
+  padding: 7px 10px;
+  border: 1px solid #c8d0d8;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f2933;
+  font: inherit;
+  cursor: pointer;
+}
+
+button#save {
+  border-color: #1f5eff;
+  background: #1f5eff;
+  color: #fff;
+}
+
+.credit {
+  margin: 14px 0 0;
+  color: #93a1ae;
+  font-size: 12px;
+  text-align: right;
+}
